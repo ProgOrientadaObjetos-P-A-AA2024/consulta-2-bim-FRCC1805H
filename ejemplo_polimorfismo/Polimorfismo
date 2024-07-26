@@ -1,0 +1,284 @@
+from abc import ABC, abstractmethod
+
+class Pago(ABC):
+    def __init__(self):
+        self.pago = 0.0
+
+    @abstractmethod
+    def calcular_pago(self):
+        pass
+
+    def obtener_pago(self):
+        return self.pago
+    
+class Persona:
+    def __init__(self, nombre, apellido, edad, cedula, ciudad):
+        self.nombre = nombre
+        self.apellido = apellido
+        self.edad = edad
+        self.cedula = cedula
+        self.ciudad = ciudad
+
+    def establecer_nombre(self, x):
+        self.nombre = x
+
+    def establecer_apellido(self, x):
+        self.apellido = x
+
+    def establecer_edad(self, x):
+        self.edad = x
+
+    def establecer_cedula(self, x):
+        self.cedula = x
+
+    def establecer_ciudad(self, x):
+        self.ciudad = x
+
+    def obtener_nombre(self):
+        return self.nombre
+
+    def obtener_apellido(self):
+        return self.apellido
+
+    def obtener_edad(self):
+        return self.edad
+
+    def obtener_cedula(self):
+        return self.cedula
+
+    def obtener_ciudad(self):
+        return self.ciudad
+
+class Ciudad:
+    def __init__(self, nombre_ciudad):
+        self.nombre_ciudad = nombre_ciudad
+
+    def establecer_nombre_ciudad(self, nombre):
+        self.nombre_ciudad = nombre
+
+    def obtener_nombre_ciudad(self):
+        return self.nombre_ciudad
+    
+class Propiedad:
+    def __init__(self, costo_propiedad):
+        self.costo_propiedad = costo_propiedad
+
+    def establecer_costo_propiedad(self, x):
+        self.costo_propiedad = x
+
+    def obtener_costo_propiedad(self):
+        return self.costo_propiedad
+
+class BilleteraPagos:
+    def __init__(self, lista_pagos, persona, mes):
+        self.lista_pagos = lista_pagos
+        self.persona = persona
+        self.mes = mes
+        self.gasto_pagos = 0.0
+
+    def establecer_lista_pagos(self, lista_pagos):
+        self.lista_pagos = lista_pagos
+
+    def establecer_persona(self, persona):
+        self.persona = persona
+
+    def establecer_mes(self, mes):
+        self.mes = mes
+
+    def calcular_gasto_pagos(self):
+        self.gasto_pagos = sum(pago.obtener_pago() for pago in self.lista_pagos)
+
+    def obtener_lista_pagos(self):
+        return self.lista_pagos
+
+    def obtener_persona(self):
+        return self.persona
+
+    def obtener_mes(self):
+        return self.mes
+
+    def obtener_gasto_pagos(self):
+        return self.gasto_pagos
+
+    def __str__(self):
+        cadena = (f"Reporte\n\t"
+                  f"Nombre: {self.persona.obtener_nombre()}\n\t"
+                  f"Apellido: {self.persona.obtener_apellido()}\n\t"
+                  f"Edad: {self.persona.obtener_edad()}\n\t"
+                  f"Cedula: {self.persona.obtener_cedula()}\n\t"
+                  f"Ciudad: {self.persona.obtener_ciudad().obtener_nombre_ciudad()}\n")
+        for pago in self.lista_pagos:
+            cadena += f"\n{pago}"
+        cadena += f"\n\nGasto pagos: {self.obtener_gasto_pagos():.2f}"
+        return cadena
+    
+class PagoAguaPotable(Pago):
+    def __init__(self, tipo, tarifa_fija, metros_cubicos, costo_consumo_cubicos):
+        super().__init__()
+        self.tarifa_fija = tarifa_fija
+        self.metros_cubicos_consumo = metros_cubicos
+        self.costo_consumo_cubicos = costo_consumo_cubicos
+        self.tipo = tipo
+
+    def establecer_tipo(self, tipo):
+        self.tipo = tipo
+
+    def obtener_tipo(self):
+        return self.tipo
+
+    def establecer_tarifa(self, tarifa):
+        self.tarifa_fija = tarifa
+
+    def establecer_metros_cubicos(self, metros):
+        self.metros_cubicos_consumo = metros
+
+    def establecer_costo_consumo(self, costo):
+        self.costo_consumo_cubicos = costo
+
+    def calcular_pago(self):
+        if self.tipo == "comercial":
+            self.pago = self.tarifa_fija + (self.metros_cubicos_consumo * self.costo_consumo_cubicos) + 15
+        else:
+            self.pago = self.tarifa_fija + (self.metros_cubicos_consumo * self.costo_consumo_cubicos)
+
+    def __str__(self):
+        return f"Pago Agua\nValor a pagar: {self.obtener_pago():.2f}"
+
+class PagoLuzElectrica(Pago):
+    def __init__(self, ciudad, tarifa_base, kilovatios_consumidos, costo_kilovatio):
+        super().__init__()
+        self.ciudad = ciudad
+        self.tarifa_base = tarifa_base
+        self.kilovatios_consumidos = kilovatios_consumidos
+        self.costo_kilovatio = costo_kilovatio
+
+    def establecer_tarifa(self, tarifa_base):
+        self.tarifa_base = tarifa_base
+
+    def establecer_kilovatios(self, kilovatios_consumidos):
+        self.kilovatios_consumidos = kilovatios_consumidos
+
+    def establecer_costo_k(self, costo_kilovatio):
+        self.costo_kilovatio = costo_kilovatio
+
+    def establecer_ciudad(self, ciudad):
+        self.ciudad = ciudad
+
+    def obtener_tarifa(self):
+        return self.tarifa_base
+
+    def obtener_kilovatios(self):
+        return self.kilovatios_consumidos
+
+    def obtener_cost_k(self):
+        return self.costo_kilovatio
+
+    def obtener_ciudad(self):
+        return self.ciudad
+
+    def calcular_pago(self):
+        nombre_ciudad = self.ciudad.obtener_nombre_ciudad()
+        if nombre_ciudad == "Loja":
+            self.pago = self.tarifa_base + (self.kilovatios_consumidos * self.costo_kilovatio / 2)
+        else:
+            self.pago = self.tarifa_base + (self.kilovatios_consumidos * self.costo_kilovatio)
+
+    def __str__(self):
+        return f"Pago luz electrica\nValor a pagar: {self.obtener_pago():.2f}"
+    
+class PagoPredial(Pago):
+    def __init__(self, casa, porcentaje):
+        super().__init__()
+        self.casa = casa
+        self.porcentaje = porcentaje
+
+    def establecer_porcentaje(self, porcentaje):
+        self.porcentaje = porcentaje
+
+    def obtener_porcentaje(self):
+        return self.porcentaje
+
+    def calcular_pago(self):
+        valor_propiedad = self.casa.obtener_costo_propiedad()
+        self.pago = valor_propiedad - ((valor_propiedad * self.porcentaje) / 100)
+
+    def __str__(self):
+        return f"Pago Casa\nValor a pagar: {self.obtener_pago():.2f}"
+    
+class PagoTelefonoConvencional(Pago):
+    def __init__(self, tarifa, minutos_consumidos, costo_minuto):
+        super().__init__()
+        self.tarifa = tarifa
+        self.minutos_consumidos = minutos_consumidos
+        self.costo_minuto = costo_minuto
+
+    def establecer_tarifa(self, tarifa):
+        self.tarifa = tarifa
+
+    def establecer_minutos_consumidos(self, minutos):
+        self.minutos_consumidos = minutos
+
+    def establecer_costo_minuto(self, costo_minuto):
+        self.costo_minuto = costo_minuto
+
+    def obtener_tarifa(self):
+        return self.tarifa
+
+    def obtener_minutos_consumidos(self):
+        return self.minutos_consumidos
+
+    def obtener_costo_minuto(self):
+        return self.costo_minuto
+
+    def calcular_pago(self):
+        self.pago = self.tarifa + (self.minutos_consumidos * self.costo_minuto)
+
+    def __str__(self):
+        return f"Pago telefono\nValor a pagar: {self.obtener_pago():.2f}"
+
+from typing import List
+
+def main():
+    pagos: List[Pago] = []
+
+    agua_casa = PagoAguaPotable("casa", 8, 75, 13)
+    pagos.append(agua_casa)
+
+    agua_comercial = PagoAguaPotable("comercial", 7, 27, 15)
+    pagos.append(agua_comercial)
+
+    ciu = Ciudad("Loja")
+    luz_casa = PagoLuzElectrica(ciu, 6.2, 160, 13)
+    pagos.append(luz_casa)
+
+    ciu2 = Ciudad("Zamora")
+    luz_comercio = PagoLuzElectrica(ciu2, 7, 195, 6)
+    pagos.append(luz_comercio)
+
+    casa1 = Propiedad(15000)
+    pago_casa1 = PagoPredial(casa1, 10)
+    pagos.append(pago_casa1)
+
+    casa2 = Propiedad(17000)
+    pago_casa2 = PagoPredial(casa2, 17)
+    pagos.append(pago_casa2)
+
+    pago_telefono_casa = PagoTelefonoConvencional(4, 500, 0.5)
+    pagos.append(pago_telefono_casa)
+
+    pago_telefono_comercio = PagoTelefonoConvencional(6, 400, 0.2)
+    pagos.append(pago_telefono_comercio)
+
+    persona = Persona("Erick", "Rodas", 19, "19008987917", ciu2)
+    
+    for pago in pagos:
+        pago.calcular_pago()
+
+    billetera_pagos = BilleteraPagos(pagos, persona, "enero")
+    billetera_pagos.calcular_gasto_pagos()
+    print(billetera_pagos)
+
+if __name__ == "__main__":
+    main()
+
+
